@@ -5,7 +5,7 @@
 1. Create virtual enviroment for python3.9+ with `python3.9 -m venv .env`
 2. Make sure created virtual enviroment is active
 3. Install dependencies `pip install -r requirements.txt`
-4. To run the app run `python app.py`
+4. Run the app with `python app.py`
 
 ## Request example
 
