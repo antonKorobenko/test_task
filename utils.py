@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 from typing import Generator, Literal
 
 
+class EmptyDataframe(Exception):
+    pass
+
+
 def prepare_data(
     filepath_1='timebase_example.csv',
     filepath_2='closing_prices.csv'
@@ -44,6 +48,9 @@ def filter_data(
     if base_currency:
         timebase_df = timebase_df[timebase_df.base_currency == base_currency]
 
+    if not len(timebase_df.index) or not len(prices_df.index):
+        raise EmptyDataframe()
+
     return timebase_df, prices_df
 
 
@@ -57,12 +64,12 @@ def get_time_intervals(
 
     INTERVALS = {
         'day': lambda start, end: pd.date_range(
-            start.date(),
-            (end + timedelta(days=1)).date(),
+            start.date(), 
+            (end + timedelta(days=1)).date(), 
             freq='D'),
         'hour': lambda start, end: pd.date_range(
-            start.floor(freq='H'),
-            end.ceil('H'),
+            start.floor(freq='H'), 
+            end.ceil(freq='H'), 
             freq='H'),
     }
 
@@ -160,8 +167,10 @@ def get_data_set(
     filepath_2='closing_prices.csv',
     **kwargs
 ) -> str:
-
-    timebase_df, prices_df = prepare_data(filepath_1, filepath_2)
-    timebase_df, prices_df = filter_data(timebase_df, prices_df, **kwargs)
-    result_df = calculate_stats_by_intervals(timebase_df, prices_df, kwargs.get('interval'))
-    return result_df.to_csv(index=False, float_format='%.8f')
+    try:
+        timebase_df, prices_df = prepare_data(filepath_1, filepath_2)
+        timebase_df, prices_df = filter_data(timebase_df, prices_df, **kwargs)
+        result_df = calculate_stats_by_intervals(timebase_df, prices_df, kwargs.get('interval'))
+        return result_df.to_csv(index=False, float_format='%.8f')
+    except EmptyDataframe:
+        return ''

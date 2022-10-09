@@ -6,8 +6,8 @@ from utils import get_data_set
 app = Flask(__name__)
 
 
-@app.route('/api', methods=['GET'])
-def get_data_set():
+@app.route('/api/get_data/', methods=['GET'])
+def get_data():
     res_csv = get_data_set(**request.args)
     return Response(
         res_csv,
